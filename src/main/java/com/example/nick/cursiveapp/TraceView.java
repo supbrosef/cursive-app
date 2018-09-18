@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.util.AttributeSet;
@@ -116,7 +118,8 @@ public class TraceView extends View {
         super.onSizeChanged(w, h, oldw, oldh);
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inMutable = true;
-        canvasBitmap = BitmapFactory.decodeResource(getResources(), currImage , options);
+        canvasBitmap = BitmapFactory.decodeResource(getResources(), currImage, options);
+
         resized = Bitmap.createScaledBitmap(canvasBitmap, w, h, false);
         drawCanvas = new Canvas(resized);
 

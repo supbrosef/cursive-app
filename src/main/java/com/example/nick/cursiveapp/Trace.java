@@ -10,6 +10,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.content.Intent;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 
@@ -57,6 +58,7 @@ public class Trace extends AppCompatActivity{
                 recreate();
             }
         });
+
 
     }
 

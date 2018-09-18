@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">CursiveApp</string>
-    <string name="title">Cursive Made Easy</string>
+    <string name="cursive">Cursive</string>
+    <string name="made">Made</string>
+    <string name="easy">Easy</string>
 </resources>
