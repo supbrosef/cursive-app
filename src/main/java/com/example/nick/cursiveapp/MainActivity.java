@@ -1,21 +1,16 @@
 package com.example.nick.cursiveapp;
 
+import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.Typeface;
-import android.support.v4.content.ContextCompat;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.content.Intent;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.StyleSpan;
-import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
 import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.TextView;
 
 
@@ -23,18 +18,30 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
+    private int myRecord;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        TextView recordText = (TextView) findViewById(R.id.recordtext);
         loadAnimation();
+        myRecord = getValue("record");
+        if (myRecord > 0){
+            String rec = String.format("%07d", myRecord);
+            rec = rec.substring(0,2) + ":" + rec.substring(2,4) + ":" + rec.substring(4,7);
+            recordText.setText(rec);
+        }
     }
 
     public void openTrace(View v){
-        Intent tracePage = new Intent (this, Trace.class);
+        Intent tracePage = new Intent (this, TraceActivity.class);
         this.startActivity(tracePage);
+    }
+
+    public void openGame(View v){
+        Intent gamePage = new Intent(this, GameActivity.class);
+        this.startActivity(gamePage);
     }
 
     public void loadAnimation(){
@@ -64,6 +71,11 @@ public class MainActivity extends AppCompatActivity {
         textViewcursive.startAnimation(fadeCursive);
         textViewmade.startAnimation(fadeMade);
         textVieweasy.startAnimation(fadeEasy);
+    }
+
+    public int getValue(String value) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        return prefs.getInt(value, 0);
     }
 
 }

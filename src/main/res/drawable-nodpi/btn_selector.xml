@@ -5,22 +5,22 @@
 
     <item android:state_pressed="true" >
         <shape android:shape="rectangle"  >
-            <solid android:color="@color/navy" />
-            <corners android:radius="3dip" />
+            <solid android:color="@color/teal" />
+            <corners android:radius="11dip" />
         </shape>
     </item>
 
     <item android:state_focused="true" >
         <shape android:shape="rectangle"  >
-            <solid android:color="@color/navy" />
-            <corners android:radius="3dip" />
+            <solid android:color="@color/teal" />
+            <corners android:radius="11dip" />
         </shape>
     </item>
 
     <item>
         <shape android:shape="rectangle" >
-            <solid android:color="@color/navy" />
-            <corners android:radius="3dip" />
+            <solid android:color="@color/teal" />
+            <corners android:radius="11dip" />
         </shape>
     </item>
 

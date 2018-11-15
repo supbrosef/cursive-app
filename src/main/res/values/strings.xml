@@ -3,4 +3,5 @@
     <string name="cursive">Cursive</string>
     <string name="made">Made</string>
     <string name="easy">Easy</string>
+    <string name="game_warning">"Match the cursive letters as fast as possible! Be aware, mistakes will count against you! Time will begin as soon as you hit ok!"</string>
 </resources>
