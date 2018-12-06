@@ -20,22 +20,24 @@ public class TraceView extends View {
 
     private Path drawPath;
     private Paint drawPaint;
-    private int paintColor = Color.BLUE;
     private Canvas drawCanvas;
     public Bitmap canvasBitmap, backgroundBitmap, resultBitmap;
     private int mWidth;
     private int mHeight;
     private int oldPix;
     private int oldX, oldY, actualBlackPixels, initialBlackPixels;
+    private int strokeWidth;
+    public boolean isTouchable = false;
     private Rect rect;
     public Map<Path, Paint> pathMap = new HashMap<>();
     public ArrayList<Integer> pixelsArrayList = new ArrayList<Integer>();
-    TraceActivity trace = (TraceActivity)getContext();
+    TraceActivity traceActivity = (TraceActivity)getContext();
+    private int paintColor = Color.BLUE;
     public int pixelAmount;
     public TraceView(Context context, AttributeSet attrs){
         super(context, attrs);
     }
-
+    float wPixel;
 
 
     private void setupDrawing(int color){
@@ -43,9 +45,9 @@ public class TraceView extends View {
         drawPaint = new Paint();
         drawPaint.setColor(color);
         drawPaint.setAntiAlias(true);
-        drawPaint.setStrokeWidth(40);
-        if (trace.isLarge == true){
-            drawPaint.setStrokeWidth(20);
+        drawPaint.setStrokeWidth(strokeWidth);
+        if (traceActivity.isLarge == true){
+            drawPaint.setStrokeWidth(strokeWidth);
         }
         drawPaint.setStyle(Paint.Style.STROKE);
         drawPaint.setStrokeJoin(Paint.Join.ROUND);
@@ -55,6 +57,9 @@ public class TraceView extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if(!rect.contains(this.getLeft() + (int) event.getX(), this.getTop() + (int) event.getY())){
+            return false;
+        }
+        if(!isTouchable){
             return false;
         }
         int touchX = (int) event.getX();
@@ -104,7 +109,9 @@ public class TraceView extends View {
                     }
                 }
                 if(actualBlackPixels < (initialBlackPixels/2)){
-                    trace.nextButton.setEnabled(true);
+                    traceActivity.nextButton.setEnabled(true);
+                    traceActivity.animLottieCheck.setVisibility(View.VISIBLE);
+                    traceActivity.animLottieCheck.playAnimation();
                 }
                 Log.d("actual pixels", Integer.toString(actualBlackPixels));
                 actualBlackPixels = 0;
@@ -145,9 +152,10 @@ public class TraceView extends View {
 
     //change letter bitmap
     public void changeBit(){
-        char currLetter = trace.currentLetter;
+        wPixel = (float)mWidth * .1f;
+        char currLetter = traceActivity.currentLetter;
         String uri = "lower" + currLetter;
-        int currImage = getResources().getIdentifier(uri, "drawable", trace.getPackageName());
+        int currImage = getResources().getIdentifier(uri, "drawable", traceActivity.getPackageName());
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inMutable = true;
 
@@ -163,6 +171,7 @@ public class TraceView extends View {
         drawCanvas = new Canvas(resultBitmap);
         int[] pixels = new int[resultBitmap.getHeight() * resultBitmap.getWidth()];
         resultBitmap.getPixels(pixels, 0, resultBitmap.getWidth(), 0, 0, resultBitmap.getWidth(), resultBitmap.getHeight());
+        strokeWidth = canvasBitmap.getWidth() / 18;
         initialBlackPixels = 0;
         actualBlackPixels = 0;
         for(int pixel:pixels) {
@@ -189,8 +198,8 @@ public class TraceView extends View {
             } else {
                 finalHeight = (int) ((float)maxWidth / ratioBitmap );
             }
-            if(trace.isLarge == true) {
-                image = Bitmap.createScaledBitmap(image, (int) ((float) finalWidth * .8), (int) ((float) finalHeight * .8), true);
+            if(traceActivity.isLarge == true) {
+                image = Bitmap.createScaledBitmap(image, (int) ((float) finalWidth * .8f), (int) ((float) finalHeight * .8f), true);
             }
             else{
                 image = Bitmap.createScaledBitmap(image, finalWidth, finalHeight, true);
@@ -211,7 +220,7 @@ public class TraceView extends View {
     }
 
     //change color of correct paths
-    public void setColor(String color){
+    public void setColorValue(String color){
         paintColor = Color.parseColor(color);
         for(Paint p : pathMap.values()){
             if(p.getColor() != Color.RED){

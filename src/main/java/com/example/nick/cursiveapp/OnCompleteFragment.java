@@ -3,7 +3,7 @@ package com.example.nick.cursiveapp;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.support.v4.app.DialogFragment;
+import androidx.fragment.app.DialogFragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,11 +21,11 @@ public class OnCompleteFragment extends DialogFragment {
         TextView result = rootView.findViewById(R.id.textView5);
         getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         if(gameActivity.isBetter == true){
-            result.setText("Congrats!. New Record: " + gameActivity.tValue);
+            result.setText("Congrats!. New Record: \n" + gameActivity.tValue);
             gameActivity.setValue("record", gameActivity.value);
         }
         else{
-            result.setText("Your time was: " + gameActivity.tValue + ". Try again to beat your previous record!");
+            result.setText("Your time was: " + gameActivity.tValue + ".\n Try again to beat your previous record!");
         }
         ok.setOnClickListener(OnClickListener);
         return rootView;

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -13,13 +13,14 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        android:fontFamily="sans-serif"
+        android:fontFamily="@font/comicneuebold"
         android:gravity="center"
         android:maxLines="1"
         android:text="Game Complete!"
         android:textColor="@color/black"
         android:textSize="34dp"
         android:textStyle="bold"
+        android:padding="@dimen/_12sdp"
         app:layout_constraintBottom_toTopOf="@+id/textView5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.48"
@@ -34,10 +35,12 @@
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
         android:padding="5dp"
-        android:text=""
+        android:text="try again"
         android:textColor="@color/black"
-        android:textSize="18sp"
+        android:textSize="@dimen/_14sdp"
         android:textStyle="bold"
+        android:gravity="center"
+        android:fontFamily="@font/comicneuebold"
         app:layout_constraintBottom_toTopOf="@+id/button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -49,8 +52,10 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:text="ok"
+        android:background="@drawable/gamebutton"
+        android:fontFamily="@font/comicneuebold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

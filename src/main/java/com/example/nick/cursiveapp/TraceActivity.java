@@ -1,34 +1,33 @@
 package com.example.nick.cursiveapp;
 
-import android.animation.AnimatorSet;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.animation.Animator;
 import android.os.Bundle;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.content.Context;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
 import android.view.animation.ScaleAnimation;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.content.Intent;
-import android.widget.ImageView;
 import android.widget.Spinner;
 import 	android.view.animation.AccelerateDecelerateInterpolator;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.load.resource.gif.GifDrawable;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
+import com.airbnb.lottie.LottieAnimationView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,77 +39,51 @@ public class TraceActivity extends AppCompatActivity  {
     private char[] alphabet = "abcdefghijklmnopqrstuvwxyz".toCharArray();
     public char currentLetter;
     public int myInt = 0;
+    public int currColor;
+    public String uri;
     String myColor = null;
     Context mContext;
     Button nextButton;
     Spinner colorSpinner;
     RecyclerView recyclerView;
-    ImageView gifView;
     public boolean isLarge;
-    private TraceView drawView;
+    private TraceView traceView;
     private Map<String, String> colorMap = new HashMap<String, String>();
     private ArrayList<ColorItem> mColorList;
     public ArrayList<Character> charList = new ArrayList<>();
     private ColorAdapter mAdapter;
     private LinearLayoutManager layoutManager = new MyCustomLayoutManager(this);
-    Animation scaleDown, rotateAnim;
+    Animation animScaleDown, animRotate;
+    LottieAnimationView animLottieView, animLottieCheck;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        loadColorMap();
+        //loadColorMap();
         colorList();
         mContext = this;
-        myInt = getValue("int");
-        myColor = getString("color");
+        myInt = getValue("currPosition");
+        myColor = getStringValue("currColor");
         setContentView(R.layout.activity_trace);
-        if (savedInstanceState != null){
-            myInt = savedInstanceState.getInt("MyInt");
-            myColor = savedInstanceState.getString("myColor");
-        }
+        Log.d("color", myColor);
         currentLetter = alphabet[myInt];
-        if(getResources().getConfiguration().smallestScreenWidthDp >= 600 ){
-            isLarge = true;
-        }
 
-        drawView = findViewById(R.id.drawing);
+        traceView = findViewById(R.id.drawing);
         nextButton = findViewById(R.id.next);
         Button resetButton = findViewById(R.id.reset);
         colorSpinner = findViewById(R.id.colorSpinner);
         mAdapter = new ColorAdapter(this, mColorList);
         recyclerView = findViewById(R.id.rvLetter);
-        gifView = findViewById(R.id.gifView);
+        animLottieView = findViewById(R.id.animation_view);
+        animLottieCheck = findViewById(R.id.check);
 
-        Glide.with(this).asGif().load(R.drawable.lettera).listener(new RequestListener<GifDrawable>() {
-            @Override
-            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<GifDrawable> target, boolean isFirstResource) {
-                return false;
-            }
-
-            @Override
-            public boolean onResourceReady(final GifDrawable resource, Object model, Target<GifDrawable> target, DataSource dataSource, boolean isFirstResource) {
-                if (resource instanceof GifDrawable){
-                    ((GifDrawable)resource).setLoopCount(1);
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            while(true) {
-                                if(!resource.isRunning()) {
-                                    gifView.setVisibility(View.INVISIBLE);
-                                    break;
-                                }
-                            }
-                        }
-                    }).start();
-                    return false;
-                }
-                return false;
-            }
-        }).into(gifView);
+        if(getResources().getConfiguration().smallestScreenWidthDp >= 600 ){
+            isLarge = true;
+        }
 
         //Color Spinner
         colorSpinner.setAdapter(mAdapter);
-        drawView.setColor(colorMap.get(myColor));
+        traceView.setColorValue(myColor);
 
         //RecyclerView
         charList = Letter.createArrayList();
@@ -122,14 +95,45 @@ public class TraceActivity extends AppCompatActivity  {
         recyclerView.smoothScrollToPosition(myInt+1);
 
         //Animations
-        scaleDown = new ScaleAnimation(1.0f, 0, 1.0f, 0, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-        scaleDown.setDuration(500);
-        scaleDown.setInterpolator(new AccelerateDecelerateInterpolator());
-        rotateAnim = AnimationUtils.loadAnimation(TraceActivity.this, R.anim.rotate);
-        rotateAnim.setFillAfter(true);
+        animScaleDown = new ScaleAnimation(1.0f, 0, 1.0f, 0, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        animScaleDown.setDuration(500);
+        animScaleDown.setInterpolator(new AccelerateDecelerateInterpolator());
+        animRotate = AnimationUtils.loadAnimation(TraceActivity.this, R.anim.rotate);
+        animRotate.setFillAfter(true);
         final AnimationSet animationSet = new AnimationSet(true);
-        animationSet.addAnimation(scaleDown);
-        animationSet.addAnimation(rotateAnim);
+        animationSet.addAnimation(animScaleDown);
+        animationSet.addAnimation(animRotate);
+
+        uri = "lower"+ currentLetter + ".json";
+        animLottieView.setAnimation(uri);
+        animLottieView.playAnimation();
+
+        animLottieCheck.setAnimation("check_animation.json");
+        animLottieCheck.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view){
+                animLottieCheck.setVisibility(View.INVISIBLE);
+                if(myInt == 6){
+                    Intent finAct = new Intent(TraceActivity.this, FinishActivity.class);
+                    TraceActivity.this.startActivity(finAct);
+                    myInt = -1;
+                    finish();
+                }
+                myInt++;
+                currentLetter = alphabet[myInt];
+
+                recyclerView.smoothScrollToPosition(myInt+1);
+                recyclerView.setLayoutManager(layoutManager);
+
+                setValue("currPosition", myInt);
+                //Animates view smaller and turns it to new view when done
+                traceView.startAnimation(animationSet);
+                traceView.isTouchable = false;
+            }
+        });
+
+
+
 
         recyclerView.addOnItemTouchListener(new RecyclerView.SimpleOnItemTouchListener() {
             @Override
@@ -143,8 +147,7 @@ public class TraceActivity extends AppCompatActivity  {
         nextButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v){
-                //Disabled for testing purposes
-                //nextButton.setEnabled(false);
+                nextButton.setEnabled(false);
                 if(myInt == 6){
                     Intent finAct = new Intent(TraceActivity.this, FinishActivity.class);
                     TraceActivity.this.startActivity(finAct);
@@ -157,8 +160,10 @@ public class TraceActivity extends AppCompatActivity  {
                 recyclerView.smoothScrollToPosition(myInt+1);
                 recyclerView.setLayoutManager(layoutManager);
 
-                setValue("int", myInt);
-                drawView.startAnimation(animationSet);
+                setValue("currPosition", myInt);
+                //Animates view smaller and turns it to new view when done
+                traceView.startAnimation(animationSet);
+                traceView.isTouchable = false;
             }
         });
 
@@ -166,10 +171,10 @@ public class TraceActivity extends AppCompatActivity  {
             public void onClick(View v){
                 myInt = 0;
                 currentLetter = alphabet[myInt];
-                setValue("int", myInt);
-                drawView.resultBitmap.recycle();
-                drawView.changeBit();
-                drawView.postInvalidate();
+                setValue("currPosition", myInt);
+                traceView.resultBitmap.recycle();
+                traceView.changeBit();
+                traceView.postInvalidate();
             }
         });
 
@@ -177,7 +182,9 @@ public class TraceActivity extends AppCompatActivity  {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 ColorItem clickedItem = (ColorItem) parent.getItemAtPosition(position);
-                drawView.setColor(colorMap.get(clickedItem.getColorName()));
+                myColor = clickedItem.getColorName();
+                traceView.setColorValue(myColor);
+                setString("currColor", myColor);
             }
 
             @Override
@@ -185,14 +192,60 @@ public class TraceActivity extends AppCompatActivity  {
             }
         });
 
+        animLottieView.addAnimatorListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                animLottieView.setVisibility(View.INVISIBLE);
+                traceView.isTouchable = true;
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+        });
+
+        //View Smaller and rotate, calls new view and view fade in
         animationSet.setAnimationListener(new Animation.AnimationListener() {
-            public void onAnimationEnd(Animation animation) {
-                drawView.resultBitmap.recycle();
-                drawView.changeBit();
-                drawView.postInvalidate();
-                //Fade in new letter
-                drawView.setAlpha(0f);
-                drawView.animate().alpha(1).setDuration(1000);
+            public void onAnimationEnd(final Animation animation) {
+                traceView.resultBitmap.recycle();
+                traceView.changeBit();
+                traceView.postInvalidate();
+                traceView.setAlpha(0f);
+                traceView.animate().alpha(1).setDuration(1000).setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+                        animLottieView.setVisibility(View.VISIBLE);
+                        uri = "lower"+ currentLetter + ".json";
+                        animLottieView.setAnimation(uri);
+                        animLottieView.playAnimation();
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animator) {
+
+                    }
+                });
                 //nextButton.setEnabled(true);
             }
             public void onAnimationRepeat(Animation animation) {
@@ -200,6 +253,7 @@ public class TraceActivity extends AppCompatActivity  {
             public void onAnimationStart(Animation animation) {
             }
         });
+        nextButton.setEnabled(false);
     }
 
 
@@ -220,9 +274,9 @@ public class TraceActivity extends AppCompatActivity  {
         editor.apply();
     }
 
-    public String getString(String value){
+    public String getStringValue(String value){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        return prefs.getString(value, "blue");
+        return prefs.getString(value, "#00FF00");
     }
     public void setString(String value, String newValue){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -231,23 +285,12 @@ public class TraceActivity extends AppCompatActivity  {
         editor.apply();
     }
 
-    public void loadColorMap(){
-        colorMap.put("green","#00FF00");
-        colorMap.put("pink","#FFC0CB");
-        colorMap.put("blue","#0000FF");
-        colorMap.put("cyan", "#00FFFF");
-        colorMap.put("yellow","#FFFF00");
-        colorMap.put("purple","#551A8B");
-    }
-
     public void colorList(){
         mColorList = new ArrayList<>();
-        mColorList.add(new ColorItem("blue", R.drawable.blue));
-        mColorList.add(new ColorItem("green",R.drawable.green));
-        mColorList.add(new ColorItem("yellow",R.drawable.yellow));
-        mColorList.add(new ColorItem("pink",R.drawable.pink));
-        mColorList.add(new ColorItem("purple",R.drawable.purple));
+        mColorList.add(new ColorItem("#FFC0CB",R.drawable.pink));
+        mColorList.add(new ColorItem("#FFFF00",R.drawable.yellow));
+        mColorList.add(new ColorItem("#00FF00",R.drawable.green));
+        mColorList.add(new ColorItem("#0000FF", R.drawable.blue));
+        mColorList.add(new ColorItem("#551A8B",R.drawable.purple));
     }
-
-
 }

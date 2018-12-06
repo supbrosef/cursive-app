@@ -2,20 +2,20 @@ package com.example.nick.cursiveapp;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentManager;
+import androidx.fragment.app.FragmentManager;
 import android.content.DialogInterface;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -47,9 +47,9 @@ public class GameActivity extends AppCompatActivity {
             int secs = (int) (updateTime / 1000);
             int mins = secs / 60;
             secs %= 60;
-            int milliseconds = (int) (updateTime % 1000);
+            int milliseconds = (int) (updateTime % 100);
             tValue = "" + String.format("%02d", mins) + ":" + String.format("%02d", secs) + ":"
-                    + String.format("%03d", milliseconds);
+                    + String.format("%02d", milliseconds);
             timerValue.setText(tValue);
             customHandler.postDelayed(this, 0);
         }
