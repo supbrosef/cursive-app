@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.media.MediaPlayer;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -18,27 +19,27 @@ import java.util.HashMap;
 
 public class TraceView extends View {
 
-    private Path drawPath;
+    public Path drawPath;
     private Paint drawPaint;
     private Canvas drawCanvas;
     public Bitmap canvasBitmap, backgroundBitmap, resultBitmap;
     private int mWidth;
     private int mHeight;
     private int oldPix;
-    private int oldX, oldY, actualBlackPixels, initialBlackPixels;
+    private int oldX, oldY, actualBlackPixels, actualRedPixels, initialBlackPixels;
     private int strokeWidth;
-    public boolean isTouchable = false;
+    public boolean isTouchable = false, isCheck = false, isCorrect = false;
     private Rect rect;
     public Map<Path, Paint> pathMap = new HashMap<>();
     public ArrayList<Integer> pixelsArrayList = new ArrayList<Integer>();
     TraceActivity traceActivity = (TraceActivity)getContext();
     private int paintColor = Color.BLUE;
     public int pixelAmount;
+    float wPixel;
+
     public TraceView(Context context, AttributeSet attrs){
         super(context, attrs);
     }
-    float wPixel;
-
 
     private void setupDrawing(int color){
         drawPath = new Path();
@@ -100,21 +101,41 @@ public class TraceView extends View {
                 break;
 
             case MotionEvent.ACTION_UP:
-                drawCanvas.drawPath(drawPath, drawPaint);
+                for (Path p : pathMap.keySet()) {
+                    drawCanvas.drawPath(p, pathMap.get(p)); //draws visual path as drawing
+                }
                 int[] pixels = new int[resultBitmap.getHeight() * resultBitmap.getWidth()];
                 resultBitmap.getPixels(pixels, 0, resultBitmap.getWidth(), 0, 0, resultBitmap.getWidth(), resultBitmap.getHeight());
                 for(int pixel:pixels) {
+                    if(pixel != Color.TRANSPARENT){
                     if(pixel == Color.BLACK){
                         actualBlackPixels++;
                     }
-                }
-                if(actualBlackPixels < (initialBlackPixels/2)){
-                    traceActivity.nextButton.setEnabled(true);
+                    if(pixel == Color.RED){
+                        actualRedPixels++;
+                    }
+                }}
+                if(actualRedPixels > initialBlackPixels/5){
+                    isCorrect = false;
+                    traceActivity.animLottieCheck.setAnimation("exout.json");
                     traceActivity.animLottieCheck.setVisibility(View.VISIBLE);
+                    traceActivity.animLottieCheck.setEnabled(true);
                     traceActivity.animLottieCheck.playAnimation();
+                    isTouchable = false;
                 }
-                Log.d("actual pixels", Integer.toString(actualBlackPixels));
+                else if (actualBlackPixels < (initialBlackPixels/2)){
+                    isCorrect = true;
+                    traceActivity.animLottieCheck.setAnimation("check_animation.json");
+                    traceActivity.animLottieCheck.setVisibility(View.VISIBLE);
+                    traceActivity.animLottieCheck.setEnabled(true);
+                    traceActivity.animLottieCheck.playAnimation();
+                    isTouchable = false;
+                }
+                else
+                Log.d("Black pixels", Integer.toString(actualBlackPixels));
+                Log.d("Blue pixels", Integer.toString(actualRedPixels));
                 actualBlackPixels = 0;
+                actualRedPixels=0;
                 break;
 
             default:
@@ -171,7 +192,7 @@ public class TraceView extends View {
         drawCanvas = new Canvas(resultBitmap);
         int[] pixels = new int[resultBitmap.getHeight() * resultBitmap.getWidth()];
         resultBitmap.getPixels(pixels, 0, resultBitmap.getWidth(), 0, 0, resultBitmap.getWidth(), resultBitmap.getHeight());
-        strokeWidth = canvasBitmap.getWidth() / 18;
+        strokeWidth = canvasBitmap.getWidth() / 14;
         initialBlackPixels = 0;
         actualBlackPixels = 0;
         for(int pixel:pixels) {
@@ -229,4 +250,5 @@ public class TraceView extends View {
         }
         invalidate();
     }
+
 }

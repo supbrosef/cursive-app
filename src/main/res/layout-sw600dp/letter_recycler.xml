@@ -8,15 +8,14 @@
 
     <TextView
         android:id="@+id/current_letter"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:fontFamily="casual"
-        android:gravity="center"
-        android:paddingRight="@dimen/_10sdp"
-        android:paddingLeft="@dimen/_10sdp"
-        android:text="TextView"
-        android:textColor="@color/lime"
-        android:textSize="@dimen/_30sdp"
+        android:fontFamily="@font/comicneuebold"
+        android:paddingRight="@dimen/_7sdp"
+        android:paddingLeft="@dimen/_7sdp"
+        android:text="a b c"
+        android:textColor="@color/black"
+        android:textSize="@dimen/_40sdp"
         android:textStyle="bold"
         tools:layout_editor_absoluteX="103dp"
         tools:layout_editor_absoluteY="168dp" />

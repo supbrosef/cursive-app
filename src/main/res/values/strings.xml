@@ -4,4 +4,11 @@
     <string name="made">Made</string>
     <string name="easy">Easy</string>
     <string name="game_warning">"Match the cursive letters as fast as possible! Be aware, mistakes will count against you! Time will begin as soon as you hit ok!"</string>
+    <string name="about">"This application was developed with the intent to teach proper cursive. Any questions, concerns, or problems with the application can be directed to takethisjaguar@gmail.com
+        \nClick anywhere to exit.</string>
+    <string name="help">Complete the trace in order to move on to the next letter! The next button will appear in the bottom right corner!
+        \n\nNot showing up? You have not completed the entire trace or the trace was not completed within the lines. Hit the eraser and try again!
+
+
+    </string>
 </resources>

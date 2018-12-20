@@ -3,10 +3,13 @@ package com.example.nick.cursiveapp;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.animation.Animator;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.content.Context;
+
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -14,16 +17,14 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
-import android.view.animation.DecelerateInterpolator;
 import android.view.animation.ScaleAnimation;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.content.Intent;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import 	android.view.animation.AccelerateDecelerateInterpolator;
 
@@ -43,7 +44,7 @@ public class TraceActivity extends AppCompatActivity  {
     public String uri;
     String myColor = null;
     Context mContext;
-    Button nextButton;
+    ImageButton buttonErase;
     Spinner colorSpinner;
     RecyclerView recyclerView;
     public boolean isLarge;
@@ -54,7 +55,9 @@ public class TraceActivity extends AppCompatActivity  {
     private ColorAdapter mAdapter;
     private LinearLayoutManager layoutManager = new MyCustomLayoutManager(this);
     Animation animScaleDown, animRotate;
+    FragmentManager fm = getSupportFragmentManager();
     LottieAnimationView animLottieView, animLottieCheck;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,15 +70,17 @@ public class TraceActivity extends AppCompatActivity  {
         setContentView(R.layout.activity_trace);
         Log.d("color", myColor);
         currentLetter = alphabet[myInt];
+        final MediaPlayer mp = MediaPlayer.create(this, R.raw.ding);
+        final MediaPlayer mpno = MediaPlayer.create(this, R.raw.no);
 
         traceView = findViewById(R.id.drawing);
-        nextButton = findViewById(R.id.next);
+        buttonErase = findViewById(R.id.buttonErase);
         Button resetButton = findViewById(R.id.reset);
         colorSpinner = findViewById(R.id.colorSpinner);
         mAdapter = new ColorAdapter(this, mColorList);
         recyclerView = findViewById(R.id.rvLetter);
         animLottieView = findViewById(R.id.animation_view);
-        animLottieCheck = findViewById(R.id.check);
+        animLottieCheck = findViewById(R.id.exout);
 
         if(getResources().getConfiguration().smallestScreenWidthDp >= 600 ){
             isLarge = true;
@@ -107,32 +112,64 @@ public class TraceActivity extends AppCompatActivity  {
         uri = "lower"+ currentLetter + ".json";
         animLottieView.setAnimation(uri);
         animLottieView.playAnimation();
+        animLottieCheck.setEnabled(false);
+        animLottieCheck.setEnabled(false);
 
-        animLottieCheck.setAnimation("check_animation.json");
+//        animLottieCheck.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View view){
+//                animLottieCheck.setVisibility(View.INVISIBLE);
+//                animLottieCheck.setEnabled(false);
+//                if(myInt == 3){
+//                    Intent finAct = new Intent(TraceActivity.this, FinishActivity.class);
+//                    TraceActivity.this.startActivity(finAct);
+//                    myInt = -1;
+//                    finish();
+//                }
+//                myInt++;
+//                currentLetter = alphabet[myInt];
+//
+//                recyclerView.smoothScrollToPosition(myInt+1);
+//                recyclerView.setLayoutManager(layoutManager);
+//
+//                setValue("currPosition", myInt);
+//                //Animates view smaller and turns it to new view when done
+//                traceView.startAnimation(animationSet);
+//                traceView.isTouchable = false;
+//            }
+//        });
         animLottieCheck.setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick(View view){
-                animLottieCheck.setVisibility(View.INVISIBLE);
-                if(myInt == 6){
-                    Intent finAct = new Intent(TraceActivity.this, FinishActivity.class);
-                    TraceActivity.this.startActivity(finAct);
-                    myInt = -1;
-                    finish();
+            public void onClick(View v) {
+                if (traceView.isCorrect == false) {
+                    traceView.changeBit();
+                    traceView.invalidate();
+                    animLottieCheck.setEnabled(false);
+                    animLottieCheck.setVisibility(View.INVISIBLE);
+                    traceView.isTouchable = true;
                 }
-                myInt++;
-                currentLetter = alphabet[myInt];
+                else {
+                    animLottieCheck.setEnabled(false);
+                    animLottieCheck.setVisibility(View.INVISIBLE);
+                    if(myInt == 3){
+                        Intent finAct = new Intent(TraceActivity.this, FinishActivity.class);
+                        TraceActivity.this.startActivity(finAct);
+                        myInt = -1;
+                        finish();
+                    }
+                    myInt++;
+                    currentLetter = alphabet[myInt];
 
-                recyclerView.smoothScrollToPosition(myInt+1);
-                recyclerView.setLayoutManager(layoutManager);
+                    recyclerView.smoothScrollToPosition(myInt+1);
+                    recyclerView.setLayoutManager(layoutManager);
 
-                setValue("currPosition", myInt);
-                //Animates view smaller and turns it to new view when done
-                traceView.startAnimation(animationSet);
-                traceView.isTouchable = false;
+                    setValue("currPosition", myInt);
+                    //Animates view smaller and turns it to new view when done
+                    traceView.startAnimation(animationSet);
+                    traceView.isTouchable = false;
+                }
             }
         });
-
-
 
 
         recyclerView.addOnItemTouchListener(new RecyclerView.SimpleOnItemTouchListener() {
@@ -144,29 +181,6 @@ public class TraceActivity extends AppCompatActivity  {
             }
         });
 
-        nextButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v){
-                nextButton.setEnabled(false);
-                if(myInt == 6){
-                    Intent finAct = new Intent(TraceActivity.this, FinishActivity.class);
-                    TraceActivity.this.startActivity(finAct);
-                    myInt = -1;
-                    finish();
-                }
-                myInt++;
-                currentLetter = alphabet[myInt];
-
-                recyclerView.smoothScrollToPosition(myInt+1);
-                recyclerView.setLayoutManager(layoutManager);
-
-                setValue("currPosition", myInt);
-                //Animates view smaller and turns it to new view when done
-                traceView.startAnimation(animationSet);
-                traceView.isTouchable = false;
-            }
-        });
-
         resetButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v){
                 myInt = 0;
@@ -175,6 +189,19 @@ public class TraceActivity extends AppCompatActivity  {
                 traceView.resultBitmap.recycle();
                 traceView.changeBit();
                 traceView.postInvalidate();
+            }
+        });
+
+        buttonErase.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                animLottieCheck.setVisibility(View.INVISIBLE);
+                animLottieCheck.setEnabled(false);
+                animLottieCheck.setVisibility(View.INVISIBLE);
+                animLottieCheck.setEnabled(false);
+                traceView.isTouchable = true;
+                traceView.changeBit();
+                traceView.invalidate();
             }
         });
 
@@ -246,14 +273,38 @@ public class TraceActivity extends AppCompatActivity  {
 
                     }
                 });
-                //nextButton.setEnabled(true);
             }
             public void onAnimationRepeat(Animation animation) {
             }
             public void onAnimationStart(Animation animation) {
             }
         });
-        nextButton.setEnabled(false);
+
+        animLottieCheck.addAnimatorListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                if(traceView.isCorrect == true) {
+                    mp.start();
+                }
+                else
+                    mpno.start();
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
     }
 
 
@@ -283,6 +334,11 @@ public class TraceActivity extends AppCompatActivity  {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(value, newValue);
         editor.apply();
+    }
+
+    public void openQuestion(View v){
+        OnQuestionFragment fragment = new OnQuestionFragment();
+        fragment.show(fm,"");
     }
 
     public void colorList(){

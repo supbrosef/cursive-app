@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.content.Intent;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         TextView recordText = (TextView) findViewById(R.id.recordtext);
         Button aboutButton = findViewById(R.id.about);
         animLottieLogo = findViewById(R.id.logo);
-        animLottieLogo.setAnimation("check_animation.json");
+        //animLottieLogo.setAnimation("logo.json");
         animLottieLogo.playAnimation();
         myRecord = getValue("record");
         if (myRecord > 0){
@@ -65,6 +66,10 @@ public class MainActivity extends AppCompatActivity {
         this.startActivity(gamePage);
     }
 
+    public void openEnd(View v){
+        Intent gameEnd = new Intent(this, FinishActivity.class);
+        this.startActivity(gameEnd);
+    }
     public int getValue(String value) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         return prefs.getInt(value, 0);
@@ -76,9 +81,8 @@ public class MainActivity extends AppCompatActivity {
                 getSystemService(LAYOUT_INFLATER_SERVICE);
         View popupView = inflater.inflate(R.layout.popupwindow, null);
 
-        final PopupWindow popupWindow = new PopupWindow(popupView, 500, 500, true);
-
-        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+        final PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, true);
+        popupWindow.showAtLocation(view, Gravity.CENTER, 10, 10);
 
         popupView.setOnTouchListener(new View.OnTouchListener() {
             @Override
