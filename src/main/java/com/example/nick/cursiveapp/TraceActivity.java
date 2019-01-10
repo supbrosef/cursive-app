@@ -22,7 +22,6 @@ import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.animation.ScaleAnimation;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.content.Intent;
 import android.widget.ImageButton;
 import android.widget.Spinner;
@@ -31,6 +30,7 @@ import 	android.view.animation.AccelerateDecelerateInterpolator;
 import com.airbnb.lottie.LottieAnimationView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,49 +38,88 @@ import java.util.Map;
 public class TraceActivity extends AppCompatActivity  {
 
     private char[] alphabet = "abcdefghijklmnopqrstuvwxyz".toCharArray();
+    private String[] alpha = new String[52];
     public char currentLetter;
-    public int myInt = 0;
-    public int currColor;
+    public String currLett;
+    public int myInt = 0, spot = 0;
     public String uri;
-    String myColor = null;
+    String myColor;
     Context mContext;
-    ImageButton buttonErase;
+    ImageButton buttonErase, buttonReplay;
     Spinner colorSpinner;
     RecyclerView recyclerView;
-    public boolean isLarge;
+    public boolean isLarge, isRandom, isUpper;
     private TraceView traceView;
     private Map<String, String> colorMap = new HashMap<String, String>();
     private ArrayList<ColorItem> mColorList;
     public ArrayList<Character> charList = new ArrayList<>();
+    public ArrayList<Integer> intList = new ArrayList<>();
     private ColorAdapter mAdapter;
     private LinearLayoutManager layoutManager = new MyCustomLayoutManager(this);
     Animation animScaleDown, animRotate;
     FragmentManager fm = getSupportFragmentManager();
     LottieAnimationView animLottieView, animLottieCheck;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //loadColorMap();
+        setContentView(R.layout.activity_trace);
+
+        for(int i = 0; i < 26;i++){
+            alpha[i] = "lower" + alphabet[i] + ".json";
+        }
+        for(int i = 26; i < 52;i++){
+            alpha[i] = "upper" + alphabet[i-26] + ".json";
+        }
+
+
         colorList();
         mContext = this;
         myInt = getValue("currPosition");
         myColor = getStringValue("currColor");
-        setContentView(R.layout.activity_trace);
+        isRandom = getIntent().getExtras().getBoolean("isRandom");
+        isUpper = getIntent().getExtras().getBoolean("isUpper");
+
+        if(isRandom){
+            for(int i=0;i<26;i++){
+                intList.add(i);
+            }
+            Collections.shuffle(intList);
+            myInt = intList.get(spot);
+            intList.remove(spot);
+        }
+        if(isUpper){
+            for(int i=26;i<52;i++){
+                intList.add(i);
+            }
+            Collections.shuffle(intList);
+            myInt = intList.get(spot);
+            intList.remove(spot);
+        }
+
         Log.d("color", myColor);
-        currentLetter = alphabet[myInt];
+
+        currLett = alpha[myInt];
+
         final MediaPlayer mp = MediaPlayer.create(this, R.raw.ding);
-        final MediaPlayer mpno = MediaPlayer.create(this, R.raw.no);
+        final MediaPlayer mpno = MediaPlayer.create(this, R.raw.buzzer);
 
         traceView = findViewById(R.id.drawing);
         buttonErase = findViewById(R.id.buttonErase);
-        Button resetButton = findViewById(R.id.reset);
         colorSpinner = findViewById(R.id.colorSpinner);
         mAdapter = new ColorAdapter(this, mColorList);
         recyclerView = findViewById(R.id.rvLetter);
         animLottieView = findViewById(R.id.animation_view);
         animLottieCheck = findViewById(R.id.exout);
+        buttonReplay = findViewById(R.id.buttonReplay);
+        ImageButton sound = (ImageButton) findViewById(R.id.buttonSound);
+
+        if (MusicService.isPlaying == true){
+            sound.setImageResource(R.drawable.sound);
+        }
+        else {
+            sound.setImageResource(R.drawable.nosound);
+        }
 
         if(getResources().getConfiguration().smallestScreenWidthDp >= 600 ){
             isLarge = true;
@@ -88,6 +127,7 @@ public class TraceActivity extends AppCompatActivity  {
 
         //Color Spinner
         colorSpinner.setAdapter(mAdapter);
+        colorSpinner.setSelection(0,false);
         traceView.setColorValue(myColor);
 
         //RecyclerView
@@ -109,35 +149,12 @@ public class TraceActivity extends AppCompatActivity  {
         animationSet.addAnimation(animScaleDown);
         animationSet.addAnimation(animRotate);
 
-        uri = "lower"+ currentLetter + ".json";
+        uri = currLett;
+
         animLottieView.setAnimation(uri);
         animLottieView.playAnimation();
         animLottieCheck.setEnabled(false);
-        animLottieCheck.setEnabled(false);
 
-//        animLottieCheck.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View view){
-//                animLottieCheck.setVisibility(View.INVISIBLE);
-//                animLottieCheck.setEnabled(false);
-//                if(myInt == 3){
-//                    Intent finAct = new Intent(TraceActivity.this, FinishActivity.class);
-//                    TraceActivity.this.startActivity(finAct);
-//                    myInt = -1;
-//                    finish();
-//                }
-//                myInt++;
-//                currentLetter = alphabet[myInt];
-//
-//                recyclerView.smoothScrollToPosition(myInt+1);
-//                recyclerView.setLayoutManager(layoutManager);
-//
-//                setValue("currPosition", myInt);
-//                //Animates view smaller and turns it to new view when done
-//                traceView.startAnimation(animationSet);
-//                traceView.isTouchable = false;
-//            }
-//        });
         animLottieCheck.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -149,21 +166,36 @@ public class TraceActivity extends AppCompatActivity  {
                     traceView.isTouchable = true;
                 }
                 else {
+                    animLottieView.cancelAnimation();
+                    animLottieView.setEnabled(false);
+                    animLottieView.setVisibility(View.INVISIBLE);
                     animLottieCheck.setEnabled(false);
                     animLottieCheck.setVisibility(View.INVISIBLE);
-                    if(myInt == 3){
+                    if(myInt == 51){
                         Intent finAct = new Intent(TraceActivity.this, FinishActivity.class);
                         TraceActivity.this.startActivity(finAct);
                         myInt = -1;
                         finish();
                     }
-                    myInt++;
-                    currentLetter = alphabet[myInt];
+                    if(isRandom || isUpper){
+                        if (intList.isEmpty()){
+                            Intent finAct = new Intent(TraceActivity.this, FinishActivity.class);
+                            TraceActivity.this.startActivity(finAct);
+                            finish();
+                        }
+                        myInt = intList.get(spot);
+                        intList.remove(spot);
+                    }
+                    else {
+                        myInt++;
+                        setValue("currPosition", myInt);
+                    }
+
+                    currLett = alpha[myInt];
 
                     recyclerView.smoothScrollToPosition(myInt+1);
                     recyclerView.setLayoutManager(layoutManager);
 
-                    setValue("currPosition", myInt);
                     //Animates view smaller and turns it to new view when done
                     traceView.startAnimation(animationSet);
                     traceView.isTouchable = false;
@@ -181,14 +213,13 @@ public class TraceActivity extends AppCompatActivity  {
             }
         });
 
-        resetButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v){
-                myInt = 0;
-                currentLetter = alphabet[myInt];
-                setValue("currPosition", myInt);
-                traceView.resultBitmap.recycle();
-                traceView.changeBit();
-                traceView.postInvalidate();
+        buttonReplay.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                animLottieView.setVisibility(View.VISIBLE);
+                animLottieView.setAnimation(uri);
+                animLottieView.playAnimation();
+                traceView.isTouchable = false;
             }
         });
 
@@ -202,6 +233,7 @@ public class TraceActivity extends AppCompatActivity  {
                 traceView.isTouchable = true;
                 traceView.changeBit();
                 traceView.invalidate();
+                traceView.actionDown = 0;
             }
         });
 
@@ -222,18 +254,18 @@ public class TraceActivity extends AppCompatActivity  {
         animLottieView.addAnimatorListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animator) {
-
+                buttonReplay.setEnabled(false);
             }
 
             @Override
             public void onAnimationEnd(Animator animator) {
                 animLottieView.setVisibility(View.INVISIBLE);
                 traceView.isTouchable = true;
+                buttonReplay.setEnabled(true);
             }
 
             @Override
             public void onAnimationCancel(Animator animator) {
-
             }
 
             @Override
@@ -252,13 +284,13 @@ public class TraceActivity extends AppCompatActivity  {
                 traceView.animate().alpha(1).setDuration(1000).setListener(new Animator.AnimatorListener() {
                     @Override
                     public void onAnimationStart(Animator animator) {
-
                     }
 
                     @Override
                     public void onAnimationEnd(Animator animator) {
                         animLottieView.setVisibility(View.VISIBLE);
                         uri = "lower"+ currentLetter + ".json";
+                        uri = currLett;
                         animLottieView.setAnimation(uri);
                         animLottieView.playAnimation();
                     }
@@ -307,7 +339,6 @@ public class TraceActivity extends AppCompatActivity  {
         });
     }
 
-
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState){
         super.onSaveInstanceState(savedInstanceState);
@@ -343,10 +374,22 @@ public class TraceActivity extends AppCompatActivity  {
 
     public void colorList(){
         mColorList = new ArrayList<>();
-        mColorList.add(new ColorItem("#FFC0CB",R.drawable.pink));
-        mColorList.add(new ColorItem("#FFFF00",R.drawable.yellow));
-        mColorList.add(new ColorItem("#00FF00",R.drawable.green));
-        mColorList.add(new ColorItem("#0000FF", R.drawable.blue));
-        mColorList.add(new ColorItem("#551A8B",R.drawable.purple));
+        mColorList.add(new ColorItem("#0000FF", R.drawable.color_blue));
+        mColorList.add(new ColorItem("#ff6680",R.drawable.color_pink));
+        mColorList.add(new ColorItem("#00FF00",R.drawable.color_green));
+        mColorList.add(new ColorItem("#551A8B",R.drawable.color_purple));
+        mColorList.add(new ColorItem("#ffa500", R.drawable.color_orange));
+    }
+
+    public void toggleSound(View v){
+        ImageButton sound = (ImageButton) findViewById(R.id.buttonSound);
+        if (MusicService.isPlaying == true){
+            stopService(new Intent(this, MusicService.class));
+            sound.setImageResource(R.drawable.nosound);
+        }
+        else {
+            startService(new Intent(this, MusicService.class));
+            sound.setImageResource(R.drawable.sound);
+        }
     }
 }

@@ -1,6 +1,8 @@
 package com.example.nick.cursiveapp;
 
+import android.app.FragmentTransaction;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.preference.PreferenceManager;
 import androidx.fragment.app.FragmentManager;
 import android.content.DialogInterface;
@@ -8,15 +10,14 @@ import android.os.Handler;
 import android.os.SystemClock;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
-
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
-
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -38,6 +39,8 @@ public class GameActivity extends AppCompatActivity {
     ArrayList<Character> letterlist = new ArrayList<>();
     LinearLayoutManager layoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false);
     long startTime = 0L, timeInMilliseconds = 0L, timeSwapBuff = 0L, updateTime = 0L;
+    MediaPlayer mp;
+
 
     Runnable updateTimerThread = new Runnable() {
         @Override
@@ -65,6 +68,12 @@ public class GameActivity extends AppCompatActivity {
         mistakeValue = findViewById(R.id.mistakeValue);
         animShake = AnimationUtils.loadAnimation(this, R.anim.shake);
 
+        mp = MediaPlayer.create(GameActivity.this, R.raw.ding);
+
+        //Turn off HW Accel on textview to avoid openGLRenderer error with large fonts
+        letterSet.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+
+        //set up buttons
         for (int i = 0; i < 26; i++) {
             txt[i] = new TextView(this);
             String idName = "textView" + Character.toString(letterArray[i]);
@@ -72,7 +81,8 @@ public class GameActivity extends AppCompatActivity {
             txt[i].setOnClickListener(onClickListener);
         }
 
-        for(int i=0;i<5;i++){
+        //add 52 letters to list
+        for(int i=0;i<52;i++){
             list.add(letterArray[i]);
         }
 
@@ -86,8 +96,11 @@ public class GameActivity extends AppCompatActivity {
                     }
                 });
         OnStartFragment dialogFragment = new OnStartFragment();
-        dialogFragment.show(fm,"");
+        dialogFragment.setCancelable(false);
+        dialogFragment.show(fm,"ww");
         myRecord= getValue("record");
+
+        final MediaPlayer mp = MediaPlayer.create(this, R.raw.ding);
     }
 
     public void startGame(){
@@ -95,6 +108,7 @@ public class GameActivity extends AppCompatActivity {
         startTime = SystemClock.uptimeMillis();
         customHandler.postDelayed(updateTimerThread,0);
     }
+
     private void changeLetter() {
         list.remove(position);
         if(list.isEmpty()){
@@ -105,6 +119,7 @@ public class GameActivity extends AppCompatActivity {
                 isBetter = true;
             }
             OnCompleteFragment completeDialog = new OnCompleteFragment();
+            completeDialog.setCancelable(false);
             completeDialog.show(fm,"");
         }
         else{
@@ -126,6 +141,12 @@ public class GameActivity extends AppCompatActivity {
             String viewId = view.getResources().getResourceEntryName(view.getId());
             if (viewId.charAt(viewId.length() - 1) == Character.toLowerCase(list.get(position))) {
                 changeLetter();
+                if(mp.isPlaying()){
+                    //mp.stop();
+                    mp.seekTo(0);
+                }
+                else
+                    mp.start();
             } else {
                 mistake++;
                 mistakeValue.setText(Integer.toString(mistake));
@@ -133,6 +154,7 @@ public class GameActivity extends AppCompatActivity {
             }
         }
     };
+
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState){

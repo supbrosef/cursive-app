@@ -27,6 +27,7 @@
             android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait" />
         <activity android:name=".GameActivity"></activity>
+        <service android:enabled="true" android:name=".MusicService" />
     </application>
 
 </manifest>

@@ -8,16 +8,20 @@
 
     <TextView
         android:id="@+id/current_letter"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
         android:fontFamily="@font/comicneuebold"
-        android:paddingRight="@dimen/_7sdp"
         android:paddingLeft="@dimen/_7sdp"
-        android:text="a b c"
+        android:paddingRight="@dimen/_7sdp"
+        android:text="a"
         android:textColor="@color/black"
         android:textSize="@dimen/_40sdp"
         android:textStyle="bold"
-        tools:layout_editor_absoluteX="103dp"
-        tools:layout_editor_absoluteY="168dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

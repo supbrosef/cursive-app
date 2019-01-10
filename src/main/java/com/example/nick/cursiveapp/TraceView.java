@@ -13,9 +13,15 @@ import android.util.AttributeSet;
 import android.graphics.Color;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
+
+import com.airbnb.lottie.LottieAnimationView;
+
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
 
 public class TraceView extends View {
 
@@ -28,6 +34,8 @@ public class TraceView extends View {
     private int oldPix;
     private int oldX, oldY, actualBlackPixels, actualRedPixels, initialBlackPixels;
     private int strokeWidth;
+    public int actionDown = 0;
+    private Set<Integer> specialLetters = new HashSet<Integer>(Arrays.asList(8,9,19,23,31,33,36,45,49));
     public boolean isTouchable = false, isCheck = false, isCorrect = false;
     private Rect rect;
     public Map<Path, Paint> pathMap = new HashMap<>();
@@ -67,8 +75,8 @@ public class TraceView extends View {
         int touchY = (int) event.getY();
         int currentPixel = resultBitmap.getPixel(touchX,touchY);
         switch (event.getAction()) {
-
             case MotionEvent.ACTION_DOWN:
+                actionDown++;
                 if (currentPixel == Color.TRANSPARENT) {
                     setupDrawing(Color.RED);
                 }
@@ -107,31 +115,31 @@ public class TraceView extends View {
                 int[] pixels = new int[resultBitmap.getHeight() * resultBitmap.getWidth()];
                 resultBitmap.getPixels(pixels, 0, resultBitmap.getWidth(), 0, 0, resultBitmap.getWidth(), resultBitmap.getHeight());
                 for(int pixel:pixels) {
-                    if(pixel != Color.TRANSPARENT){
-                    if(pixel == Color.BLACK){
-                        actualBlackPixels++;
+                    if(pixel != Color.TRANSPARENT) {
+                        if (pixel == Color.BLACK) {
+                            actualBlackPixels++;
+                        }
+                        if (pixel == Color.RED) {
+                            actualRedPixels++;
+                        }
                     }
-                    if(pixel == Color.RED){
-                        actualRedPixels++;
+                }
+                if(specialLetters.contains(traceActivity.myInt)){
+                    if (actualRedPixels > initialBlackPixels / 5 || pathMap.size() > 5) {
+                        setIncorrect();
                     }
-                }}
-                if(actualRedPixels > initialBlackPixels/5){
-                    isCorrect = false;
-                    traceActivity.animLottieCheck.setAnimation("exout.json");
-                    traceActivity.animLottieCheck.setVisibility(View.VISIBLE);
-                    traceActivity.animLottieCheck.setEnabled(true);
-                    traceActivity.animLottieCheck.playAnimation();
-                    isTouchable = false;
+                    else if (actualBlackPixels < (initialBlackPixels / 2) && actionDown > 1) {
+                        setCorrect();
+                    }
                 }
-                else if (actualBlackPixels < (initialBlackPixels/2)){
-                    isCorrect = true;
-                    traceActivity.animLottieCheck.setAnimation("check_animation.json");
-                    traceActivity.animLottieCheck.setVisibility(View.VISIBLE);
-                    traceActivity.animLottieCheck.setEnabled(true);
-                    traceActivity.animLottieCheck.playAnimation();
-                    isTouchable = false;
+                else {
+                    if (actualRedPixels > initialBlackPixels / 5 || pathMap.size() > 5 || actionDown > 1) {
+                        setIncorrect();
+                    }
+                    else if (actualBlackPixels < (initialBlackPixels / 2)) {
+                        setCorrect();
+                    }
                 }
-                else
                 Log.d("Black pixels", Integer.toString(actualBlackPixels));
                 Log.d("Blue pixels", Integer.toString(actualRedPixels));
                 actualBlackPixels = 0;
@@ -171,11 +179,29 @@ public class TraceView extends View {
         }
     }
 
+    public void setIncorrect(){
+            isCorrect = false;
+            traceActivity.animLottieCheck.setAnimation("exout.json");
+            traceActivity.animLottieCheck.setVisibility(View.VISIBLE);
+            traceActivity.animLottieCheck.setEnabled(true);
+            traceActivity.animLottieCheck.playAnimation();
+            isTouchable = false;
+        }
+
+    public void setCorrect(){
+         isCorrect = true;
+         traceActivity.animLottieCheck.setAnimation("check_animation.json");
+         traceActivity.animLottieCheck.setVisibility(View.VISIBLE);
+         traceActivity.animLottieCheck.setEnabled(true);
+         traceActivity.animLottieCheck.playAnimation();
+         isTouchable = false;
+    }
+
     //change letter bitmap
     public void changeBit(){
         wPixel = (float)mWidth * .1f;
-        char currLetter = traceActivity.currentLetter;
-        String uri = "lower" + currLetter;
+        String uri = traceActivity.currLett;
+        uri = uri.substring(0,6);
         int currImage = getResources().getIdentifier(uri, "drawable", traceActivity.getPackageName());
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inMutable = true;
@@ -195,6 +221,7 @@ public class TraceView extends View {
         strokeWidth = canvasBitmap.getWidth() / 14;
         initialBlackPixels = 0;
         actualBlackPixels = 0;
+        actionDown = 0;
         for(int pixel:pixels) {
             if(pixel == Color.BLACK){
                 initialBlackPixels++;
@@ -209,6 +236,7 @@ public class TraceView extends View {
         if (maxHeight > 0 && maxWidth > 0) {
             int width = image.getWidth();
             int height = image.getHeight();
+
             float ratioBitmap = (float) width / (float) height;
             float ratioMax = (float) maxWidth / (float) maxHeight;
 
@@ -219,12 +247,7 @@ public class TraceView extends View {
             } else {
                 finalHeight = (int) ((float)maxWidth / ratioBitmap );
             }
-            if(traceActivity.isLarge == true) {
-                image = Bitmap.createScaledBitmap(image, (int) ((float) finalWidth * .8f), (int) ((float) finalHeight * .8f), true);
-            }
-            else{
-                image = Bitmap.createScaledBitmap(image, finalWidth, finalHeight, true);
-            }
+            image = Bitmap.createScaledBitmap(image, finalWidth, finalHeight, true);
             return image;
         } else {
             return image;
