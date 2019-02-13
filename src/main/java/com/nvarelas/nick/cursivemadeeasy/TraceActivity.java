@@ -1,5 +1,6 @@
-package com.example.nick.cursiveapp;
+package com.nvarelas.nick.cursivemadeeasy;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.animation.Animator;
@@ -26,44 +27,44 @@ import android.content.Intent;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import 	android.view.animation.AccelerateDecelerateInterpolator;
-
 import com.airbnb.lottie.LottieAnimationView;
-
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+
 
 
 public class TraceActivity extends AppCompatActivity  {
 
+    Context mContext;
+    public int myInt = 0, spot = 0;
+    public String currLett;
+    public String uri;
+    public char currentLetter;
+    public boolean isLarge, isRandom, isUpper;
+    public ArrayList<Character> charList = new ArrayList<>();
+    public ArrayList<Integer> intList = new ArrayList<>();
+    public LottieAnimationView animLottieView, animLottieCheck;
+
     private char[] alphabet = "abcdefghijklmnopqrstuvwxyz".toCharArray();
     private String[] alpha = new String[52];
-    public char currentLetter;
-    public String currLett;
-    public int myInt = 0, spot = 0;
-    public String uri;
-    String myColor;
-    Context mContext;
+    private String myColor;
+    private ArrayList<ColorItem> mColorList;
+
     ImageButton buttonErase, buttonReplay;
     Spinner colorSpinner;
     RecyclerView recyclerView;
-    public boolean isLarge, isRandom, isUpper;
-    private TraceView traceView;
-    private Map<String, String> colorMap = new HashMap<String, String>();
-    private ArrayList<ColorItem> mColorList;
-    public ArrayList<Character> charList = new ArrayList<>();
-    public ArrayList<Integer> intList = new ArrayList<>();
-    private ColorAdapter mAdapter;
-    private LinearLayoutManager layoutManager = new MyCustomLayoutManager(this);
+    TraceView traceView;
+    ColorAdapter mAdapter;
     Animation animScaleDown, animRotate;
     FragmentManager fm = getSupportFragmentManager();
-    LottieAnimationView animLottieView, animLottieCheck;
+    LinearLayoutManager layoutManager = new MyCustomLayoutManager(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trace);
+
+        Intent svc = new Intent(this, GameService.class);
 
         for(int i = 0; i < 26;i++){
             alpha[i] = "lower" + alphabet[i] + ".json";
@@ -77,8 +78,10 @@ public class TraceActivity extends AppCompatActivity  {
         mContext = this;
         myInt = getValue("currPosition");
         myColor = getStringValue("currColor");
-        isRandom = getIntent().getExtras().getBoolean("isRandom");
-        isUpper = getIntent().getExtras().getBoolean("isUpper");
+        if(getIntent().getExtras() != null) {
+            isRandom = getIntent().getExtras().getBoolean("isRandom");
+            isUpper = getIntent().getExtras().getBoolean("isUpper");
+        }
 
         if(isRandom){
             for(int i=0;i<26;i++){
@@ -89,7 +92,7 @@ public class TraceActivity extends AppCompatActivity  {
             intList.remove(spot);
         }
         if(isUpper){
-            for(int i=26;i<52;i++){
+            for(int i=26;i<51;i++){
                 intList.add(i);
             }
             Collections.shuffle(intList);
@@ -112,10 +115,11 @@ public class TraceActivity extends AppCompatActivity  {
         animLottieView = findViewById(R.id.animation_view);
         animLottieCheck = findViewById(R.id.exout);
         buttonReplay = findViewById(R.id.buttonReplay);
-        ImageButton sound = (ImageButton) findViewById(R.id.buttonSound);
+        ImageButton sound = findViewById(R.id.buttonSound);
 
-        if (MusicService.isPlaying == true){
+        if (MainActivity.isPlaying){
             sound.setImageResource(R.drawable.sound);
+            startService(svc);
         }
         else {
             sound.setImageResource(R.drawable.nosound);
@@ -158,7 +162,7 @@ public class TraceActivity extends AppCompatActivity  {
         animLottieCheck.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (traceView.isCorrect == false) {
+                if (!traceView.isCorrect) {
                     traceView.changeBit();
                     traceView.invalidate();
                     animLottieCheck.setEnabled(false);
@@ -183,8 +187,10 @@ public class TraceActivity extends AppCompatActivity  {
                             TraceActivity.this.startActivity(finAct);
                             finish();
                         }
-                        myInt = intList.get(spot);
-                        intList.remove(spot);
+                        else {
+                            myInt = intList.get(spot);
+                            intList.remove(spot);
+                        }
                     }
                     else {
                         myInt++;
@@ -206,7 +212,7 @@ public class TraceActivity extends AppCompatActivity  {
 
         recyclerView.addOnItemTouchListener(new RecyclerView.SimpleOnItemTouchListener() {
             @Override
-            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+            public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
                 // true: consume touch event
                 // false: dispatch touch event
                 return true;
@@ -315,7 +321,7 @@ public class TraceActivity extends AppCompatActivity  {
         animLottieCheck.addAnimatorListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
-                if(traceView.isCorrect == true) {
+                if(traceView.isCorrect) {
                     mp.start();
                 }
                 else
@@ -382,14 +388,41 @@ public class TraceActivity extends AppCompatActivity  {
     }
 
     public void toggleSound(View v){
-        ImageButton sound = (ImageButton) findViewById(R.id.buttonSound);
-        if (MusicService.isPlaying == true){
-            stopService(new Intent(this, MusicService.class));
+        ImageButton sound = findViewById(R.id.buttonSound);
+        if (GameService.isPlaying){
+            stopService(new Intent(this, GameService.class));
             sound.setImageResource(R.drawable.nosound);
+            MainActivity.isPlaying = false;
         }
         else {
-            startService(new Intent(this, MusicService.class));
+            startService(new Intent(this, GameService.class));
             sound.setImageResource(R.drawable.sound);
+            MainActivity.isPlaying = true;
         }
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        ImageButton sound = findViewById(R.id.buttonSound);
+        if (MainActivity.isPlaying){
+            sound.setImageResource(R.drawable.sound);
+            startService(new Intent(this, GameService.class));
+        }
+        else {
+            sound.setImageResource(R.drawable.nosound);
+        }
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        stopService(new Intent(this, GameService.class));
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        stopService(new Intent(this, GameService.class));
     }
 }

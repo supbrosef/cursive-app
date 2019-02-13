@@ -1,7 +1,6 @@
-package com.example.nick.cursiveapp;
+package com.nvarelas.nick.cursivemadeeasy;
 
 import android.content.Context;
-
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
@@ -11,11 +10,11 @@ import android.util.DisplayMetrics;
 public class MyCustomLayoutManager extends LinearLayoutManager {
 
     private static final float MILLISECONDS_PER_INCH = 800f;
-    Context mContext;
+    //private Context mContext;
 
-    public MyCustomLayoutManager(Context context) {
+    MyCustomLayoutManager(Context context) {
         super(context);
-        mContext = context;
+        //mContext = context;
     }
 
     @Override

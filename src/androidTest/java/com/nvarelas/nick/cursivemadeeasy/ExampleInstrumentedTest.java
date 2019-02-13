@@ -1,20 +1,4 @@
-package com.example.nick.cursiveapp;
-
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-
-import androidx.test.InstrumentationRegistry;
-import androidx.test.runner.AndroidJUnit4;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
-import static org.junit.Assert.*;
+package com.nvarelas.nick.cursivemadeeasy;
 
 /**
  * Instrumented test, which will execute on an Android device.

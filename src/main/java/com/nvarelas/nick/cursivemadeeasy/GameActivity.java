@@ -1,6 +1,5 @@
-package com.example.nick.cursiveapp;
+package com.nvarelas.nick.cursivemadeeasy;
 
-import android.app.FragmentTransaction;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.preference.PreferenceManager;
@@ -10,15 +9,14 @@ import android.os.Handler;
 import android.os.SystemClock;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Random;
 
 public class GameActivity extends AppCompatActivity {
@@ -27,19 +25,17 @@ public class GameActivity extends AppCompatActivity {
     private TextView txt[] = new TextView[26];
     private int position, mistake = 0;
     private char[] letterArray = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
-    private ArrayList<Character> list = new ArrayList<Character>();
+    private ArrayList<Character> list = new ArrayList<>();
     public int myRecord,value;
     Random rand = new Random();
     Handler customHandler = new Handler();
     Animation animShake;
-    Button okButton;
     public String tValue;
     public boolean isBetter = false;
     FragmentManager fm = getSupportFragmentManager();
-    ArrayList<Character> letterlist = new ArrayList<>();
     LinearLayoutManager layoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false);
     long startTime = 0L, timeInMilliseconds = 0L, timeSwapBuff = 0L, updateTime = 0L;
-    MediaPlayer mp;
+    MediaPlayer mpRight, mpWrong;
 
 
     Runnable updateTimerThread = new Runnable() {
@@ -51,13 +47,14 @@ public class GameActivity extends AppCompatActivity {
             int mins = secs / 60;
             secs %= 60;
             int milliseconds = (int) (updateTime % 100);
-            tValue = "" + String.format("%02d", mins) + ":" + String.format("%02d", secs) + ":"
-                    + String.format("%02d", milliseconds);
+            tValue = "" + String.format(Locale.US, "%02d", mins) + ":" + String.format(Locale.US,"%02d", secs) + ":"
+                    + String.format(Locale.US, "%02d", milliseconds);
             timerValue.setText(tValue);
             customHandler.postDelayed(this, 0);
         }
     };
 
+    @SuppressWarnings("InflateParams")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +65,8 @@ public class GameActivity extends AppCompatActivity {
         mistakeValue = findViewById(R.id.mistakeValue);
         animShake = AnimationUtils.loadAnimation(this, R.anim.shake);
 
-        mp = MediaPlayer.create(GameActivity.this, R.raw.ding);
+        mpRight = MediaPlayer.create(GameActivity.this, R.raw.ding);
+        mpWrong = MediaPlayer.create(GameActivity.this, R.raw.buzzer);
 
         //Turn off HW Accel on textview to avoid openGLRenderer error with large fonts
         letterSet.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
@@ -99,8 +97,6 @@ public class GameActivity extends AppCompatActivity {
         dialogFragment.setCancelable(false);
         dialogFragment.show(fm,"ww");
         myRecord= getValue("record");
-
-        final MediaPlayer mp = MediaPlayer.create(this, R.raw.ding);
     }
 
     public void startGame(){
@@ -131,8 +127,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private int numValue(String val){
-        int retVal  = Integer.valueOf(val.replaceAll("[^0-9]",""));
-        return retVal;
+        return Integer.valueOf(val.replaceAll("[^0-9]",""));
     }
 
     private View.OnClickListener onClickListener = new View.OnClickListener() {
@@ -141,16 +136,22 @@ public class GameActivity extends AppCompatActivity {
             String viewId = view.getResources().getResourceEntryName(view.getId());
             if (viewId.charAt(viewId.length() - 1) == Character.toLowerCase(list.get(position))) {
                 changeLetter();
-                if(mp.isPlaying()){
+                if(mpRight.isPlaying()){
                     //mp.stop();
-                    mp.seekTo(0);
+                    mpRight.seekTo(0);
                 }
                 else
-                    mp.start();
+                    mpRight.start();
             } else {
                 mistake++;
-                mistakeValue.setText(Integer.toString(mistake));
+                mistakeValue.setText(String.format(Locale.US, "%d", mistake));
                 letterSet.startAnimation(animShake);
+                if(mpWrong.isPlaying()){
+                    //mp.stop();
+                    mpWrong.seekTo(0);
+                }
+                else
+                    mpWrong.start();
             }
         }
     };
@@ -172,7 +173,6 @@ public class GameActivity extends AppCompatActivity {
         editor.putInt(value, newValue);
         editor.apply();
     }
-
 
 }
 

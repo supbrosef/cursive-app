@@ -1,18 +1,27 @@
 <resources>
     <string name="app_name">Cursive Made Easy</string>
-    <string name="cursive">Cursive</string>
-    <string name="made">Made</string>
-    <string name="easy">Easy</string>
-    <string name="game_warning">"Match the cursive letters as fast as possible! Be aware, mistakes will count against you! Time will begin as soon as you hit ok!"</string>
-    <string name="about">"This application was developed with the intent to teach proper cursive. Any questions, concerns, or problems with the application can be directed to takethisjaguar@gmail.com
-        \nClick anywhere to exit.</string>
-    <string name="help">Complete the trace in order to move on to the next letter! The next button will appear in the bottom right corner!
+    <string name="question_tv_help">Complete the trace in order to move on to the next letter! The next button will appear in the bottom right corner!
         \n\nNot showing up?
         \n 1. The trace is incomplete
         \n 2. Most letters can be completed with 1 continuous stroke
         \n 3. Your trace has too many mistakes
-        \n\nHit the eraser and try again!
-
-
-    </string>
+        \n\nHit the eraser and try again!</string>
+    <string name="complete_tv_newrecord">Congrats!. New Record: %s\n</string>
+    <string name="complete_tv_samerecord">"Your time was: %s.\nTry again to beat your previous record!"</string>
+    <string name="main_tv_setrecord">Current Record: %s</string>
+    <string name="main_bt_start">Start</string>
+    <string name="main_bt_lowercase">Random Lowercase</string>
+    <string name="main_bt_uppercase">Random Uppercase</string>
+    <string name="main_bt_matching">Matching Game</string>
+    <string name="main_tv_record">Current Record:\n --:--:-- </string>
+    <string name="finish_tv_congrats">Great job completing the alphabet in cursive!</string>
+    <string name="finish_tv_notice">Now use a pencil and paper to write each letter after completing the trace. This will help you learn and remember the whole alphabet quickly!</string>
+    <string name="finish_bt_main">Main Menu</string>
+    <string name="gameend_tv_complete">Game Complete!</string>
+    <string name="gameend_bt_ok">OK</string>
+    <string name="gamestart_tv_game">Letter Matching Game!</string>
+    <string name="gamestart_tv_warning">"Match the cursive letters as fast as possible! Be aware, mistakes will count against you! Time will begin as soon as you hit OK!"</string>
+    <string name="popup_tv_about">"This application was developed for educational purposes. Any questions, concerns, or problems with the application can be directed to n.varelas777@gmail.com.
+        \nClick anywhere to exit.</string>
+    <string name="popup_bt_rate">Rate on PlayStore!</string>
 </resources>

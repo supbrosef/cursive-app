@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.nick.cursiveapp">
+    package="com.nvarelas.nick.cursivemadeeasy"
+    >
+    <supports-screens
+        android:smallScreens="true"
+        android:normalScreens="true"
+        android:resizeable="true"
+        android:largeScreens="true"
+        android:xlargeScreens="true" />
 
     <application
         android:allowBackup="true"
@@ -9,7 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name="com.nvarelas.nick.cursivemadeeasy.MainActivity"
             android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -19,15 +26,24 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".TraceActivity"
+            android:name="com.nvarelas.nick.cursivemadeeasy.TraceActivity"
             android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".FinishActivity"
+            android:name="com.nvarelas.nick.cursivemadeeasy.FinishActivity"
             android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait" />
-        <activity android:name=".GameActivity"></activity>
-        <service android:enabled="true" android:name=".MusicService" />
+        <activity
+            android:name="com.nvarelas.nick.cursivemadeeasy.GameActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <service
+            android:name="com.nvarelas.nick.cursivemadeeasy.MusicService"
+            android:enabled="true" />
+        <service
+            android:name="com.nvarelas.nick.cursivemadeeasy.GameService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

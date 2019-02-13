@@ -1,11 +1,10 @@
-package com.example.nick.cursiveapp;
+package com.nvarelas.nick.cursivemadeeasy;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.media.MediaPlayer;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -13,10 +12,6 @@ import android.util.AttributeSet;
 import android.graphics.Color;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
-
-import com.airbnb.lottie.LottieAnimationView;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
@@ -35,11 +30,10 @@ public class TraceView extends View {
     private int oldX, oldY, actualBlackPixels, actualRedPixels, initialBlackPixels;
     private int strokeWidth;
     public int actionDown = 0;
-    private Set<Integer> specialLetters = new HashSet<Integer>(Arrays.asList(8,9,19,23,31,33,36,45,49));
-    public boolean isTouchable = false, isCheck = false, isCorrect = false;
+    private Set<Integer> specialLetters = new HashSet<>(Arrays.asList(8,9,19,23,31,33,36,45,49));
+    public boolean isTouchable = false, isCorrect = false;
     private Rect rect;
     public Map<Path, Paint> pathMap = new HashMap<>();
-    public ArrayList<Integer> pixelsArrayList = new ArrayList<Integer>();
     TraceActivity traceActivity = (TraceActivity)getContext();
     private int paintColor = Color.BLUE;
     public int pixelAmount;
@@ -55,7 +49,7 @@ public class TraceView extends View {
         drawPaint.setColor(color);
         drawPaint.setAntiAlias(true);
         drawPaint.setStrokeWidth(strokeWidth);
-        if (traceActivity.isLarge == true){
+        if (traceActivity.isLarge){
             drawPaint.setStrokeWidth(strokeWidth);
         }
         drawPaint.setStyle(Paint.Style.STROKE);
@@ -63,6 +57,8 @@ public class TraceView extends View {
         drawPaint.setStrokeCap(Paint.Cap.ROUND);
     }
 
+
+    @SuppressWarnings({"ClickableViewAccessibility", "ConstantConditions"})
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if(!rect.contains(this.getLeft() + (int) event.getX(), this.getTop() + (int) event.getY())){
@@ -172,6 +168,7 @@ public class TraceView extends View {
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     protected void onDraw(Canvas canvas) {
         canvas.drawBitmap(resultBitmap,0,0,drawPaint);
         for (Path p : pathMap.keySet()) {
@@ -273,5 +270,4 @@ public class TraceView extends View {
         }
         invalidate();
     }
-
 }

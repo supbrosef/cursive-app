@@ -1,9 +1,8 @@
-package com.example.nick.cursiveapp;
+package com.nvarelas.nick.cursivemadeeasy;
 
 import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +12,7 @@ import android.widget.ImageView;
 import java.util.ArrayList;
 
 public class ColorAdapter extends ArrayAdapter<ColorItem>{
-    public ColorAdapter(Context context, ArrayList<ColorItem> colorList){
+    ColorAdapter(Context context, ArrayList<ColorItem> colorList){
         super(context, 0 , colorList);
     }
 

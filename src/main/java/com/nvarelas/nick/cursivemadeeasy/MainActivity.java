@@ -1,44 +1,34 @@
-package com.example.nick.cursiveapp;
+package com.nvarelas.nick.cursivemadeeasy;
+
 
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-
 import android.os.Bundle;
 import android.content.Intent;
-import android.text.SpannableStringBuilder;
-import android.text.style.ForegroundColorSpan;
-import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.airbnb.lottie.LottieAnimationView;
-import com.airbnb.lottie.animation.content.Content;
 import com.flurry.android.FlurryAgent;
-
-
-//https://code.tutsplus.com/tutorials/android-sdk-create-a-drawing-app-touch-interaction--mobile-19202
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
     Context mContext;
     private int myRecord;
     LottieAnimationView animLottieLogo;
+    public static boolean isPlaying = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,18 +38,19 @@ public class MainActivity extends AppCompatActivity {
                 .withLogEnabled(true)
                 .build(this, "928TS9YT6FCYTHPZ6V33");
         setContentView(R.layout.activity_main);
-        TextView recordText = (TextView) findViewById(R.id.recordtext);
+        TextView recordText = findViewById(R.id.recordtext);
         ImageButton aboutButton = findViewById(R.id.about);
         animLottieLogo = findViewById(R.id.logo);
         animLottieLogo.playAnimation();
         myRecord = getValue("record");
         if (myRecord > 0){
-            String rec = String.format("%06d", myRecord);
+            String rec = String.format(Locale.US, "%06d", myRecord);
             rec = rec.substring(0,2) + ":" + rec.substring(2,4) + ":" + rec.substring(4,6);
-            recordText.setText("Current Record:\n" + rec);
+            recordText.setText(getString(R.string.main_tv_setrecord, rec));
         }
 
         Intent svc = new Intent(this, MusicService.class);
+        svc.putExtra("test", true);
         startService(svc);
 
         aboutButton.setOnClickListener(new View.OnClickListener() {
@@ -74,11 +65,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         if (resultCode == RESULT_OK){
             int newRecord = data.getIntExtra("result",0);
-            TextView recordText = (TextView) findViewById(R.id.recordtext);
+            TextView recordText = findViewById(R.id.recordtext);
             if (newRecord > 0){
-                String rec = String.format("%06d", newRecord);
+                String rec = String.format(Locale.US,"%06d", newRecord);
                 rec = rec.substring(0,2) + ":" + rec.substring(2,4) + ":" + rec.substring(4,6);
-                recordText.setText("Current Record:\n" + rec);
+                recordText.setText(getString(R.string.main_tv_setrecord, rec));
             }
         }
     }
@@ -94,10 +85,6 @@ public class MainActivity extends AppCompatActivity {
         this.startActivityForResult(gamePage, myRecord);
     }
 
-    public void openEnd(View v){
-        Intent gameEnd = new Intent(this, FinishActivity.class);
-        this.startActivity(gameEnd);
-    }
 
     public void openRandomTrace(View v){
         Intent randomPage = new Intent (this, TraceActivity.class);
@@ -117,19 +104,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void toggleSound(View v){
-        ImageButton sound = (ImageButton) findViewById(R.id.buttonSound);
-        if (MusicService.isPlaying == true){
+        ImageButton sound = findViewById(R.id.buttonSound);
+        if (MusicService.isPlaying){
             stopService(new Intent(this, MusicService.class));
             sound.setImageResource(R.drawable.nosound);
+            isPlaying = false;
         }
         else {
             startService(new Intent(this, MusicService.class));
             sound.setImageResource(R.drawable.sound);
+            isPlaying = true;
         }
     }
 
+    @SuppressWarnings({"InflateParams", "ClickableViewAccessibility"})
     public void onButtonShowPopupWindowClick(View view) {
-
         LayoutInflater inflater = (LayoutInflater)
                 getSystemService(LAYOUT_INFLATER_SERVICE);
         View popupView = inflater.inflate(R.layout.popupwindow, null);
@@ -142,10 +131,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 try {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getPackageName())));
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("amzn://apps/android?p=" + getPackageName())));
                 }
                 catch (ActivityNotFoundException e){
-                    Toast.makeText(getApplicationContext(), "Error Opening Google Play Store...", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Error Opening Amazon App Store...", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -160,21 +149,39 @@ public class MainActivity extends AppCompatActivity {
     }
 
 //    @Override
-//    protected void onStop(){
-//        mContext.stopService(new Intent(mContext, MusicService.class));
-//        super.onStop();
-//    }
-//
-//    @Override
-//    protected void onPause(){
-//        mContext.stopService(new Intent(this, MusicService.class));
-//        super.onPause();
-//    }
-//
-//    @Override
-//    protected void onResume(){
-//        mContext.startService(new Intent(mContext, MusicService.class));
+//    public void onResume(){
 //        super.onResume();
+//        startService(new Intent(this, MusicService.class));
 //    }
 
+//    @Override
+//    public void onDestroy(){
+//        super.onDestroy();
+//        stopService(new Intent(this, MusicService.class));
+//    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        ImageButton sound = findViewById(R.id.buttonSound);
+        if (MainActivity.isPlaying){
+            sound.setImageResource(R.drawable.sound);
+            startService(new Intent(this, MusicService.class));
+        }
+        else {
+            sound.setImageResource(R.drawable.nosound);
+        }
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        stopService(new Intent(this, MusicService.class));
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        stopService(new Intent(this, MusicService.class));
+    }
 }

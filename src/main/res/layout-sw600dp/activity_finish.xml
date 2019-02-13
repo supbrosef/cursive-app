@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/woodcropped"
-    tools:context=".FinishActivity">
+    tools:context=".FinishActivity"
+    tools:ignore="Overdraw">
 
 
     <TextView
@@ -13,10 +14,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:fontFamily="@font/comicneuebold"
-        android:text="Great job finishing your first run through!"
+        android:text="@string/finish_tv_congrats"
         android:textAlignment="center"
         android:textColor="@color/black"
-        android:textSize="30dp"
+        android:textSize="@dimen/_12sdp"
         app:layout_constraintBottom_toTopOf="@+id/textView2"
         app:layout_constraintEnd_toStartOf="@+id/guideline31"
         app:layout_constraintHorizontal_bias="0.5"
@@ -28,10 +29,10 @@
         android:layout_width="0dp"
         android:layout_height="129dp"
         android:fontFamily="@font/comicneuebold"
-        android:text="We recommend completing the alphabet a few more times before moving on to the randomizer!"
+        android:text="@string/finish_tv_notice"
         android:textAlignment="center"
         android:textColor="@color/black"
-        android:textSize="30dp"
+        android:textSize="@dimen/_12sdp"
         app:layout_constraintBottom_toTopOf="@+id/buttonMenu"
         app:layout_constraintEnd_toStartOf="@+id/guideline31"
         app:layout_constraintHorizontal_bias="0.5"
@@ -49,8 +50,8 @@
         android:layout_marginBottom="8dp"
         android:background="@drawable/buttonblue"
         android:fontFamily="@font/comicneuebold"
-        android:text="Main Menu"
-        android:textSize="50dp"
+        android:text="@string/finish_bt_main"
+        android:textSize="50sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline31"
         app:layout_constraintStart_toStartOf="@+id/guideline32"

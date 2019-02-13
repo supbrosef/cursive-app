@@ -1,5 +1,6 @@
-package com.example.nick.cursiveapp;
+package com.nvarelas.nick.cursivemadeeasy;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,22 +12,22 @@ import java.util.List;
 
 public class LetterAdapter extends RecyclerView.Adapter<LetterAdapter.MyViewHolder>  {
 
-    public List<Character> mLetters;
+    private List<Character> mLetters;
 
 
-    public LetterAdapter(List<Character> letters){
+    LetterAdapter(List<Character> letters){
         mLetters = letters;
     }
 
+    @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType){
         View letterView = LayoutInflater.from(parent.getContext()).inflate(R.layout.letter_recycler, parent, false);
-        MyViewHolder myViewHolder = new MyViewHolder(letterView);
-        return myViewHolder;
+        return new MyViewHolder(letterView);
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
 
         char letter = mLetters.get(position);
         holder.letterTextView.setText(Character.toString(letter));
@@ -37,10 +38,10 @@ public class LetterAdapter extends RecyclerView.Adapter<LetterAdapter.MyViewHold
         return mLetters.size();
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder{
+    class MyViewHolder extends RecyclerView.ViewHolder{
         TextView letterTextView;
 
-        public MyViewHolder(View itemView){
+        MyViewHolder(View itemView){
             super(itemView);
             letterTextView = itemView.findViewById(R.id.current_letter);
         }

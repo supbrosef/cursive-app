@@ -1,19 +1,19 @@
-package com.example.nick.cursiveapp;
+package com.nvarelas.nick.cursivemadeeasy;
 
-public class ColorItem {
+class ColorItem {
     private String mColorName;
     private int mColorImage;
 
-    public ColorItem(String colorName, int colorImage){
+    ColorItem(String colorName, int colorImage){
         mColorName = colorName;
         mColorImage = colorImage;
     }
 
-    public String getColorName(){
+    String getColorName(){
         return mColorName;
     }
 
-    public int getColorImage(){
+    int getColorImage(){
         return mColorImage;
     }
 }

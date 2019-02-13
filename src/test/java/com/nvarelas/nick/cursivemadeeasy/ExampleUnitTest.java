@@ -1,4 +1,4 @@
-package com.example.nick.cursiveapp;
+package com.nvarelas.nick.cursivemadeeasy;
 
 import org.junit.Test;
 
