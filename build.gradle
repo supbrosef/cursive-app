@@ -33,7 +33,6 @@ android {
 
 dependencies {
     implementation 'com.google.android.gms:play-services-base:8.4.0'
-    implementation 'com.flurry.android:analytics:11.4.0@aar'
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha2'

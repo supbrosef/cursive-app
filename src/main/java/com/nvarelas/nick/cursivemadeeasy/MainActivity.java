@@ -34,9 +34,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         mContext = this;
         super.onCreate(savedInstanceState);
-        new FlurryAgent.Builder()
-                .withLogEnabled(true)
-                .build(this, "928TS9YT6FCYTHPZ6V33");
         setContentView(R.layout.activity_main);
         TextView recordText = findViewById(R.id.recordtext);
         ImageButton aboutButton = findViewById(R.id.about);
