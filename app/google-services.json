@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "368845840393",
+    "firebase_url": "https://cursive-made-easy-ac907.firebaseio.com",
+    "project_id": "cursive-made-easy-ac907",
+    "storage_bucket": "cursive-made-easy-ac907.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:368845840393:android:470364fb4fe31d0880d8d8",
+        "android_client_info": {
+          "package_name": "com.example.nick.cursiveapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "368845840393-e4fuaivh4m62optrb1b2qv6adv4qorpi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhTLUHmIl4CSdLr6YKEg22QTaZMlfNu5Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "368845840393-e4fuaivh4m62optrb1b2qv6adv4qorpi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
